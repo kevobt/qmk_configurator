@@ -20,6 +20,20 @@
     >
       <font-awesome-icon icon="trash" size="lg" fixed-width />
     </button>
+    <button
+      class="clear-button"
+      v-tooltip="$t('layer.title')"
+      @click="onMoveLayerUpClick"
+    >
+      Up
+    </button>
+    <button
+      class="clear-button"
+      v-tooltip="$t('layer.title')"
+      @click="onMoveLayerDownClick"
+    >
+      Down
+    </button>
   </div>
 </template>
 <script>
@@ -56,7 +70,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('keymap', ['changeLayer', 'initLayer']),
+    ...mapMutations('keymap', ['changeLayer', 'initLayer', 'moveLayerUp', 'moveLayerDown']),
     clicked(id) {
       if (isUndefined(this.getLayer(id))) {
         this.initLayer({
@@ -73,6 +87,30 @@ export default {
           code: this.defaultClearLayerCode
         });
         this.$store.commit('keymap/setDirty');
+      }
+    },
+    onMoveLayerUpClick() {
+      if (this.layer + 1 < 16) {
+        if (isUndefined(this.getLayer(this.layer + 1))) {
+            this.initLayer({
+              layer: this.layer + 1,
+              code: this.defaultClearLayerCode
+            });
+        }
+        this.moveLayerUp(this.layer);
+        this.changeLayer(this.layer + 1);
+      }
+    },
+    onMoveLayerDownClick() {
+      if (this.layer > 1) {
+        if (isUndefined(this.getLayer(this.layer - 1))) {
+            this.initLayer({
+              layer: this.layer - 1,
+              code: this.defaultClearLayerCode
+            });
+        }
+        this.moveLayerDown(this.layer);
+        this.changeLayer(this.layer - 1);
       }
     }
   }

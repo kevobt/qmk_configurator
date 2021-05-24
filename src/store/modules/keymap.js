@@ -268,6 +268,25 @@ const mutations = {
     mutations.setSelected(state, undefined);
     mutations.setDirty(state);
   },
+  moveLayerUp(state, index) {
+    if (state.keymap[index + 1] === undefined) {
+      return;
+    }
+
+    var temp = state.keymap[index + 1];
+    Vue.set(state.keymap, index + 1, state.keymap[index]);
+    Vue.set(state.keymap, index, temp);
+    return;
+  },
+  moveLayerDown(state, index) {
+    if (state.keymap[index - 1] === undefined) {
+      return;
+    }
+
+    var temp = state.keymap[index - 1];
+    Vue.set(state.keymap, index - 1, state.keymap[index]);
+    Vue.set(state.keymap, index, temp);
+  },
   setText(state, { layer, index, text }) {
     Vue.set(state.keymap[layer][index], 'text', text);
   },
