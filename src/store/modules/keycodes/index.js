@@ -1,15 +1,17 @@
 import isUndefined from 'lodash/isUndefined';
 import ansi from './ansi';
+import german from './german';
 import iso_jis from './iso-jis';
 import quantum from './quantum';
 import settings from './kb-settings';
 import media from './app-media-mouse';
 import steno from './steno';
 const state = {
-  keycodes: [...ansi, ...iso_jis, ...quantum, ...settings, ...media],
+  keycodes: [...ansi, ...german, ...iso_jis, ...quantum, ...settings, ...media],
   searchFilter: '',
   searchCounters: {
     ANSI: 0,
+    German: 0,
     'ISO/JIS': 0,
     Quantum: 0,
     KeyboardSettings: 0,
@@ -50,6 +52,7 @@ const mutations = {
   enableSteno(state) {
     state.keycodes = [
       ...ansi,
+      ...german,
       ...iso_jis,
       ...quantum,
       ...settings,
@@ -58,13 +61,14 @@ const mutations = {
     ];
   },
   disableSteno(state) {
-    state.keycodes = [...ansi, ...iso_jis, ...quantum, ...settings, ...media];
+    state.keycodes = [...ansi, ...german, ...iso_jis, ...quantum, ...settings, ...media];
   },
   setSearchFilter(state, newVal) {
     state.searchFilter = newVal;
     if (this.searchFilter !== '') {
       state.searchCounters = {
         ANSI: countMatches(state.searchFilter, ansi),
+        German: countMatches(state.searchFilter, german),
         'ISO/JIS': countMatches(state.searchFilter, iso_jis),
         Quantum: countMatches(state.searchFilter, quantum),
         KeyboardSettings: countMatches(state.searchFilter, settings),

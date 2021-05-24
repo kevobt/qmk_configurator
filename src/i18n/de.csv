@@ -42,6 +42,7 @@ keyboard:label,Tastatur
 keycodes:label,Keycodes
 keycodesRef:label,Keycode-Referenz
 keycodesTab:ANSI:label,ANSI
+keycodesTab:German:label,German
 keycodesTab:AppMediaMouse:label,"App, Media und Maus"
 keycodesTab:ISO/JIS:label,ISO/JIS
 keycodesTab:KeyboardSettings:label,Tastatureinstellungen
