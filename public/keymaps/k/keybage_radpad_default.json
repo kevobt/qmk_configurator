@@ -1,7 +1,7 @@
 {
   "keyboard": "keybage/radpad",
   "keymap": "default",
-  "commit": "a6a13f96262ef1e8c91546f24cff5067f8026c23",
+  "commit": "4e1c5887c5c08ebd2cf7868c8d9292aa728e7bf0",
   "layout": "LAYOUT_4x4_encoders",
   "layers": [
     [

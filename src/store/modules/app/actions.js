@@ -1,7 +1,12 @@
 import axios from 'axios';
 import isUndefined from 'lodash/isUndefined';
-import { backend_keyboards_url } from '@/store/modules/constants';
-import { getPreferredLayout, getExclusionList } from '@/jquery';
+import * as keypress from 'keypress.js';
+import { generateKeypressCombos } from './keypress';
+import {
+  backend_keyboards_url,
+  backend_keyboard_list_url
+} from '@/store/modules/constants';
+import { getPreferredLayout, getExclusionList } from '@/util';
 import { localStorageSet, CONSTS } from '@/store/localStorage';
 
 const steno_keyboards = ['gergo', 'georgi'];
@@ -11,10 +16,10 @@ const actions = {
    * fetchKeyboards - fetch keyboard list from API
    */
   async fetchKeyboards({ commit }) {
-    const r = await axios.get(backend_keyboards_url);
+    const r = await axios.get(backend_keyboard_list_url);
     if (r.status === 200) {
       const exclude = getExclusionList();
-      const results = r.data.filter(keeb => {
+      const results = r.data.keyboards.filter((keeb) => {
         return isUndefined(exclude[keeb]);
       });
       commit('setKeyboards', results);
@@ -31,7 +36,7 @@ const actions = {
     const keyboardName = state.keyboard.replace(/\//g, '_');
     return axios
       .get(`keymaps/${keyboardPath}/${keyboardName}_default.json`)
-      .then(r => {
+      .then((r) => {
         if (r.status === 200) {
           return r.data;
         }
@@ -41,7 +46,7 @@ const actions = {
    * load keymap from the selected URL
    */
   async loadKeymapFromUrl(_, url) {
-    return axios.get(url).then(r => {
+    return axios.get(url).then((r) => {
       return r.data;
     });
   },
@@ -54,7 +59,7 @@ const actions = {
   changeKeyboard({ state, commit, dispatch }, keyboard) {
     const store = this;
     let clearKeymap = false;
-    const promise = new Promise(resolve => {
+    const promise = new Promise((resolve) => {
       commit('disablePreview');
       commit('enableCompile');
       if (state.keyboard !== keyboard) {
@@ -75,7 +80,7 @@ const actions = {
         commit('setLayout', nextLayout);
 
         // enable and disable steno in keycode UI
-        const stenoCheck = steno_keyboards.reduce((acc, keeb) => {
+        const stenoCheck = steno_keyboards.reduce((_, keeb) => {
           return { [keeb]: true };
         }, {});
         if (stenoCheck[keyboard]) {
@@ -103,7 +108,7 @@ const actions = {
   loadLayouts({ commit, state }, preview) {
     if (!isUndefined(preview)) {
       preview.layouts['  '] = { layout: [] };
-      let p = new Promise(resolve => {
+      let p = new Promise((resolve) => {
         let fake = {
           keyboards: {}
         };
@@ -115,8 +120,8 @@ const actions = {
       return p;
     }
     return axios
-      .get(backend_keyboards_url + '/' + state.keyboard)
-      .then(resp => {
+      .get(`${backend_keyboards_url}/${state.keyboard}/info.json`)
+      .then((resp) => {
         commit('setKeyboardMeta', resp);
         commit('processLayouts', resp);
         return resp;
@@ -199,6 +204,35 @@ const actions = {
         await dispatch('saveConfiguratorSettings');
       }
     }
+  },
+  // initialize keypress.js using helper functions in ./keypress.js
+  async initKeypressListener({ commit }) {
+    const store = this;
+    const keypressListener = new keypress.Listener();
+    const conf = generateKeypressCombos(
+      store,
+      store.getters['keycodes/keycodes']
+    );
+    keypressListener.register_many(conf);
+    keypressListener.simple_combo('ctrl shift i', () => {
+      if (!store.state.app.isPreview) {
+        commit('requestPreview');
+      }
+    });
+    keypressListener.simple_combo('ctrl alt n', () => {
+      store.commit('keymap/nextColorway');
+    });
+    keypressListener.simple_combo('ctrl alt u', () => {
+      store.commit('keymap/toggleDisplaySizes');
+    });
+    keypressListener.simple_combo('ctrl alt f', () => {
+      store.commit('keymap/toggleContinuousInput');
+    });
+    keypressListener.simple_combo('ctrl alt s', () => {
+      commit('toggleSettingsPanel');
+    });
+
+    commit('setKeypressListener', () => keypressListener);
   }
 };
 

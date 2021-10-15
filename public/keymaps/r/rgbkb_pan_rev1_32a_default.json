@@ -1,7 +1,7 @@
 {
   "keyboard": "rgbkb/pan/rev1/32a",
   "keymap": "default",
-  "commit": "abf1902ff597e77e910c0fb9a8d132b46f78317b",
+  "commit": "4e1c5887c5c08ebd2cf7868c8d9292aa728e7bf0",
   "layout": "LAYOUT_all",
   "layers": [
     [
